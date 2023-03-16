@@ -1,0 +1,10 @@
+spring:
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: webflux-course 
+      username: [DB_USER_NAME]
+      password:
+      - [DB_PASSWORD_NAME]
+      
