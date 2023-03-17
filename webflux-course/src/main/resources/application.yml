@@ -6,4 +6,5 @@ spring:
       database: ${DB_NAME:webflux-course} 
       username: ${USER_DB:admin}
       password: ${PASSWORD_DB}
+      auto-index-creation: true
       
