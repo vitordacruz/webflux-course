@@ -4,6 +4,7 @@ import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.stereotype.Repository;
 
 import br.com.course.webfluxcourse.entity.User;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Repository
@@ -23,4 +24,8 @@ public class UserRepository {
     public Mono<User> findById(String id) {
 		return reactiveMongoTemplate.findById(id, User.class);
     }
+
+	public Flux<User> findAll() {
+		return reactiveMongoTemplate.findAll(User.class);
+	}
 }

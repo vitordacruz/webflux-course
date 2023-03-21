@@ -37,8 +37,10 @@ public class UserControllerImpl implements UserController {
 
 	@Override
 	public ResponseEntity<Flux<UserResponse>> findAll() {
-		// TODO Auto-generated method stub
-		return null;
+
+		return ResponseEntity.ok(
+				userService.findAll().map(userMapper::toResponse)
+		);
 	}
 
 	@Override

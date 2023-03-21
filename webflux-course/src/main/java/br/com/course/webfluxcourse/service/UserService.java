@@ -8,6 +8,7 @@ import br.com.course.webfluxcourse.entity.User;
 import br.com.course.webfluxcourse.mapper.UserMapper;
 import br.com.course.webfluxcourse.model.request.UserRequest;
 import br.com.course.webfluxcourse.repository.UserRepository;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -28,5 +29,9 @@ public class UserService {
 							String.format("Object not found. Id: %s, Type: %s", id, User.class.getSimpleName())
 					)
 				));
+	}
+
+	public Flux<User> findAll() {
+		return repository.findAll();
 	}
 }
