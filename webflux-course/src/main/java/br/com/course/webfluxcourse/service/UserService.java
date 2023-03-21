@@ -1,5 +1,6 @@
 package br.com.course.webfluxcourse.service;
 
+import br.com.course.webfluxcourse.service.exception.ObjectNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +22,11 @@ public class UserService {
 	}
 
 	public  Mono<User> findById(final String id) {
-		return repository.findById(id);
+		return repository.findById(id)
+				.switchIfEmpty(Mono.error(
+					new ObjectNotFoundException(
+							String.format("Object not found. Id: %s, Type: %s", id, User.class.getSimpleName())
+					)
+				));
 	}
 }
