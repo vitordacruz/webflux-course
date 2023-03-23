@@ -1,6 +1,8 @@
 package br.com.course.webfluxcourse.repository;
 
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 
 import br.com.course.webfluxcourse.entity.User;
@@ -27,5 +29,11 @@ public class UserRepository {
 
 	public Flux<User> findAll() {
 		return reactiveMongoTemplate.findAll(User.class);
+	}
+
+	public Mono<User> findAndRemove(String id) {
+		Query query = new Query();
+		Criteria where = Criteria.where("id").is(id);
+		return reactiveMongoTemplate.findAndRemove(query.addCriteria(where), User.class);
 	}
 }
