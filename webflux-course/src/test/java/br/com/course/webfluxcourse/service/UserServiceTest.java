@@ -54,7 +54,8 @@ class UserServiceTest {
         Mono<User> result =  service.findById("123");
 
         StepVerifier.create(result)
-                .expectNextMatches(user -> user.getClass() == User.class)
+                .expectNextMatches(user -> user.getClass() == User.class
+                && user.getId().equals("123"))
                 .expectComplete()
                 .verify();
 
