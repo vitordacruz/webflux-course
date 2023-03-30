@@ -22,6 +22,7 @@ import reactor.core.publisher.Mono;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
@@ -56,6 +57,47 @@ class UserControllerImplTest {
 
         Mockito.verify(service, times(1))
                 .save(any(UserRequest.class));
+
+    }
+
+    @Test
+    @DisplayName("Test endpoint saving with BadRequest by save name field with leading blanks")
+    void testSaveWithBadRequestWithBlanksSpace() {
+        final UserRequest request = new UserRequest(" Vitor", "vitor@mail.com", "123");
+
+        webTestClient.post().uri("/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(request))
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody()
+                .jsonPath("$.path").isEqualTo("/users")
+                .jsonPath("$.status").isEqualTo(BAD_REQUEST.value())
+                .jsonPath("$.error").isEqualTo("Validation error")
+                .jsonPath("$.message").isEqualTo("Error on validation attributes")
+                .jsonPath("$.errors[0].fieldName").isEqualTo("name")
+                .jsonPath("$.errors[0].message").isEqualTo("field cannot have blank spaces at the beginning or at the end");
+
+    }
+
+    @Test
+    @DisplayName("Test endpoint save with bad request when e-mail is invalid")
+    void testSaveWithBadRequestWhenEmailIsInvalid() {
+        final UserRequest request = new UserRequest("Vitor", "vitor.mail.com", "123");
+
+        webTestClient.post().uri("/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(request))
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody()
+                .jsonPath("$.path").isEqualTo("/users")
+                .jsonPath("$.status").isEqualTo(BAD_REQUEST.value())
+                .jsonPath("$.error").isEqualTo("Validation error")
+                .jsonPath("$.message").isEqualTo("Error on validation attributes")
+                .jsonPath("$.errors[0].fieldName").isEqualTo("email")
+                .jsonPath("$.errors[0].message").isEqualTo("invalid email");
+
 
     }
 
