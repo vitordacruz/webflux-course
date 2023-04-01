@@ -3,6 +3,7 @@ package br.com.course.webfluxcourse.controller;
 import br.com.course.webfluxcourse.entity.User;
 import br.com.course.webfluxcourse.mapper.UserMapper;
 import br.com.course.webfluxcourse.model.request.UserRequest;
+import br.com.course.webfluxcourse.model.response.UserResponse;
 import br.com.course.webfluxcourse.service.UserService;
 import com.mongodb.reactivestreams.client.MongoClient;
 import org.junit.jupiter.api.DisplayName;
@@ -20,6 +21,7 @@ import org.springframework.web.reactive.function.BodyInserters;
 import reactor.core.publisher.Mono;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
@@ -102,7 +104,22 @@ class UserControllerImplTest {
     }
 
     @Test
-    void findById() {
+    @DisplayName("Test find by id endpoit with success")
+    void testFindByIdWithSuccess() {
+        final var id = "123456";
+        final var userResponse = new UserResponse(id, "Vitor", "vitor@mail.com", "123");
+
+        when(service.findById(anyString())).thenReturn(Mono.just(User.builder().build()));
+        when(mapper.toResponse(any(User.class))).thenReturn(userResponse);
+
+        webTestClient.get().uri("/users/" + id)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.id").isEqualTo(id)
+                .jsonPath("$.name").isEqualTo("Vitor")
+                .jsonPath("$.email").isEqualTo("vitor@mail.com");
     }
 
     @Test
