@@ -25,8 +25,7 @@ import reactor.core.publisher.Mono;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
 @ExtendWith(SpringExtension.class)
@@ -126,6 +125,10 @@ class UserControllerImplTest {
                 .jsonPath("$.id").isEqualTo(ID)
                 .jsonPath("$.name").isEqualTo(NAME)
                 .jsonPath("$.email").isEqualTo(EMAIL);
+
+        verify(service).findById(anyString());
+        verify(mapper).toResponse(any(User.class));
+
     }
 
     @Test
@@ -164,10 +167,34 @@ class UserControllerImplTest {
                 .jsonPath("$.[0].id").isEqualTo(ID)
                 .jsonPath("$.[0].name").isEqualTo(NAME)
                 .jsonPath("$.[0].email").isEqualTo(EMAIL);
+
+        verify(service).findAll();
+        verify(mapper).toResponse(any(User.class));
     }
 
     @Test
+    @DisplayName("Test update endpoit with success")
     void update() {
+        final UserRequest request = new UserRequest(NAME, EMAIL, PASSWORD);
+        final var userResponse = new UserResponse(ID, NAME, EMAIL, PASSWORD);
+
+        when(service.update(anyString(), any(UserRequest.class)))
+                .thenReturn(Mono.just(User.builder().build()));
+        when(mapper.toResponse(any(User.class))).thenReturn(userResponse);
+
+
+        webTestClient.patch().uri("/users/" +ID)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(request))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.id").isEqualTo(ID)
+                .jsonPath("$.name").isEqualTo(NAME)
+                .jsonPath("$.email").isEqualTo(EMAIL);
+
+        verify(service).update(anyString(), any(UserRequest.class));
+        verify(mapper).toResponse(any(User.class));
     }
 
     @Test
