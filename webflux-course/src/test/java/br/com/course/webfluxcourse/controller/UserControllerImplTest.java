@@ -31,6 +31,10 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 @AutoConfigureWebTestClient
 class UserControllerImplTest {
 
+    public static final String ID = "123456";
+    public static final String NAME = "Vitor";
+    public static final String EMAIL = "vitor@mail.com";
+    public static final String PASSWORD = "123";
     @Autowired
     private WebTestClient webTestClient;
 
@@ -46,7 +50,7 @@ class UserControllerImplTest {
     @Test
     @DisplayName("Test endpoint save with success")
     void testSaveWithSuccess() {
-        final UserRequest request = new UserRequest("Vitor", "vitor@mail.com", "123");
+        final UserRequest request = new UserRequest(NAME, EMAIL, PASSWORD);
 
         when(service.save(any(UserRequest.class)))
                 .thenReturn(Mono.just(User.builder().build()));
@@ -65,7 +69,7 @@ class UserControllerImplTest {
     @Test
     @DisplayName("Test endpoint saving with BadRequest by save name field with leading blanks")
     void testSaveWithBadRequestWithBlanksSpace() {
-        final UserRequest request = new UserRequest(" Vitor", "vitor@mail.com", "123");
+        final UserRequest request = new UserRequest(NAME.concat(" "), EMAIL, PASSWORD);
 
         webTestClient.post().uri("/users")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -85,7 +89,7 @@ class UserControllerImplTest {
     @Test
     @DisplayName("Test endpoint save with bad request when e-mail is invalid")
     void testSaveWithBadRequestWhenEmailIsInvalid() {
-        final UserRequest request = new UserRequest("Vitor", "vitor.mail.com", "123");
+        final UserRequest request = new UserRequest(NAME, "vitor.mail.com", PASSWORD);
 
         webTestClient.post().uri("/users")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -106,20 +110,19 @@ class UserControllerImplTest {
     @Test
     @DisplayName("Test find by id endpoit with success")
     void testFindByIdWithSuccess() {
-        final var id = "123456";
-        final var userResponse = new UserResponse(id, "Vitor", "vitor@mail.com", "123");
+        final var userResponse = new UserResponse(ID, NAME, EMAIL, PASSWORD);
 
         when(service.findById(anyString())).thenReturn(Mono.just(User.builder().build()));
         when(mapper.toResponse(any(User.class))).thenReturn(userResponse);
 
-        webTestClient.get().uri("/users/" + id)
+        webTestClient.get().uri("/users/" + ID)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
-                .jsonPath("$.id").isEqualTo(id)
-                .jsonPath("$.name").isEqualTo("Vitor")
-                .jsonPath("$.email").isEqualTo("vitor@mail.com");
+                .jsonPath("$.id").isEqualTo(ID)
+                .jsonPath("$.name").isEqualTo(NAME)
+                .jsonPath("$.email").isEqualTo(EMAIL);
     }
 
     @Test
