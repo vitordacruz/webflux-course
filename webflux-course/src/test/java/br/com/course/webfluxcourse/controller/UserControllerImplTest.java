@@ -198,6 +198,16 @@ class UserControllerImplTest {
     }
 
     @Test
-    void delete() {
+    @DisplayName("Test delete endpoit with success")
+    void testDeleteWithSuccess() {
+
+        when(service.delete(anyString()))
+                .thenReturn(Mono.just(User.builder().build()));
+
+        webTestClient.delete().uri("/users/" +ID)
+                .exchange()
+                .expectStatus().isOk();
+
+        verify(service).delete(anyString());
     }
 }
